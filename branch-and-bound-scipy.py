@@ -13,9 +13,15 @@ node_values = {}
 def branch_and_bound(x1_range=(0, None), x2_range=(0, None)):
     global node_counter, best_solution, edges, node_values
 
-    c = [-1, -0.64]
-    A_ub = [[50, 31], [-3, 2]]
-    b_ub = [250, 4]
+    c = [-1, -2]
+    A_ub = [
+        [4, 0],
+        [0, 1],
+        [2, 3],
+        [-10, 15],
+        [-20, -15]
+    ]
+    b_ub = [13, 3, 14, 32, -16]
 
     bounds = [x1_range, x2_range]
 
@@ -50,6 +56,9 @@ def branch_and_bound(x1_range=(0, None), x2_range=(0, None)):
             branch_and_bound(x1_range=x1_range, x2_range=(0, x2_floor))
             edges.append((node_id, node_counter))
             branch_and_bound(x1_range=x1_range, x2_range=(x2_floor+1, None))
+    else:
+        # Update node_values with the current node's x, y values, and objective value
+        node_values[node_id] = (None, None, None)
 
 
 def visualize_tree(edges, node_values):
@@ -67,7 +76,10 @@ def visualize_tree(edges, node_values):
     # Zeichnen Sie die Labels mit einer Bounding-Box um jedes
     labels = {}
     for node, values in node_values.items():
-        labels[node] = f"x={values[0]}, y={values[1]}, z={values[2]}"
+        if values[0] is None:
+            labels[node] = "Infeasible"
+        else:
+            labels[node] = f"x={values[0]}, y={values[1]}, z={values[2]}"
         
     nx.draw_networkx_labels(G, pos, labels, bbox=dict(boxstyle='round,pad=0.3', edgecolor='black', facecolor='white'))
     
